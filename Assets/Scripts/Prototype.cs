@@ -72,5 +72,7 @@ public class Prototype : MonoBehaviour {
 			}
 			}
 		}
+
+		Debug.Log("HANDS IN FRAME: " + hands.Count);
 	}
 }

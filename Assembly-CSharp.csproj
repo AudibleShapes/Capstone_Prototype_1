@@ -101,7 +101,6 @@
      <Compile Include="Assets\LeapMotion\Scripts\Utils\KeyToggleEnabled.cs" />
      <Compile Include="Assets\LeapMotion\Scripts\Utils\LeapRecorder.cs" />
      <Compile Include="Assets\LeapMotion\Scripts\Utils\LeapUnityExtensions.cs" />
-     <Compile Include="Assets\LeapMotion\Scripts\Utils\MagneticPinch.cs" />
      <Compile Include="Assets\LeapMotion\Scripts\Utils\StretchToScreen.cs" />
      <Compile Include="Assets\LeapMotion\Scripts\Utils\TriggerDrawing.cs" />
      <Compile Include="Assets\LeapMotion\Scripts\Utils\Utils.cs" />
@@ -144,9 +143,13 @@
      <Compile Include="Assets\OVR\Scripts\Util\OVRScreenFade.cs" />
      <Compile Include="Assets\OVR\Scripts\Util\OVRUGUI.cs" />
      <Compile Include="Assets\OVR\Scripts\Util\OVRVisionGuide.cs" />
+     <Compile Include="Assets\Scripts\CreateAudibleShapes.cs" />
+     <Compile Include="Assets\Scripts\Instantiate_Grid.cs" />
+     <Compile Include="Assets\Scripts\LightIntensity.cs" />
      <Compile Include="Assets\Scripts\MagneticPinch.cs" />
      <Compile Include="Assets\Scripts\Prototype.cs" />
-     <Compile Include="Assets\Scripts\RigidHand.cs" />
+     <Compile Include="Assets\Scripts\SUBTITLE_GUI.cs" />
+     <Compile Include="Assets\Scripts\TitleScreen.cs" />
      <None Include="Assets\Plugins\donotdelete.txt" />
      <None Include="Assets\LeapMotion\Materials\Sources\Shaders\Toony-Basic.shader" />
      <None Include="Assets\LeapMotion\Resources\LeapCG.cginc" />
