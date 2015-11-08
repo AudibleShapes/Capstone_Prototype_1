@@ -13,15 +13,11 @@ public class LightIntensity : MonoBehaviour {
 
 	public void changeIntensity(float intensity) {
 		if (intensity != 1.0f) {
-			if (lt.intensity > intensity) {
+			if (lt.intensity > intensity)
 				lt.intensity -= Time.deltaTime*duration;
-				Debug.Log("LIGHT LOWERED");
-			}
 		} else {
-			if (lt.intensity < intensity) {
+			if (lt.intensity < intensity)
 				lt.intensity += Time.deltaTime*duration;
-				Debug.Log("LIGHT HEIGHTENED");
-			}
 		}
 	}
 

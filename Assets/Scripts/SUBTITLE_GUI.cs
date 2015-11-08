@@ -44,12 +44,12 @@ public class SUBTITLE_GUI : MonoBehaviour {
 
 			if (timeHand < 0  && !isPinched) {
 				isPinched = true;
-				hand = (Texture) Resources.Load("Images/PinchedHand");
+				hand = (Texture) Resources.Load("Images/Pinching_2");
 				timeHand = 2.0f;
 				timeHand -= Time.deltaTime;
 			} else if (timeHand < 0 && isPinched){
 				isPinched = false;
-				hand = (Texture) Resources.Load("Images/UnpinchedHand");
+				hand = (Texture) Resources.Load("Images/Pinching_1");
 				timeHand = 2.0f;
 				timeHand -= Time.deltaTime;
 			}

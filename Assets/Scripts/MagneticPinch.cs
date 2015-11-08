@@ -29,15 +29,25 @@ public class MagneticPinch : MonoBehaviour {
 	protected Collider grabbed_;
 
     public static bool isHelpEnabled;
+	public static int count;
+
 	public CreateAudibleShapes _cas;
 	public LightIntensity _lt;
+	public SPOTLIGHTINTENSITY spt_cube;
+	public SPOTLIGHTINTENSITY spt_sphere;
+	public SPOTLIGHTINTENSITY spt_capsule;
+	public SPOTLIGHTINTENSITY spt_cylinder;
+	public SPOTLIGHTINTENSITY spt_tutorial;
+	public SPOTLIGHTINTENSITY spt_garbage;
+	public SPOTLIGHTINTENSITY spt_mode;
+	public SPOTLIGHTINTENSITY spt_grid;
 
 	public GameObject helpTitle;
 	public GameObject modeButton;
 	public GUIStyle header;
 	public GUIStyle main;
 	public GUIStyle style;
-	public GUIStyle substyle;
+	public GUIStyle enjoy;
 	public Texture hand;
 	public Texture cube;
 	public Texture sphere;
@@ -46,10 +56,16 @@ public class MagneticPinch : MonoBehaviour {
 	public Texture help;
 	public Texture garbage;
 	public Texture mode;
-	private float timeLeft = 2.0f;
-	private bool isPinched = false;
+	public float timeLeft = 2.0f;
+	public bool isPinched = false;
 	private GameObject prefab;
 	private bool isGestureMode = false;
+
+	public static readonly int COUNT_CREATE = 0;
+	public static readonly int COUNT_PLACE = 1;
+	public static readonly int COUNT_DELETE = 2;
+	public static readonly int COUNT_MODE = 3;
+	public static readonly int COUNT_HELP = 4;
 
 	public readonly double XCUBE_MIN = -1.1;
 	public readonly double XCUBE_MAX = -0.4;
@@ -66,7 +82,6 @@ public class MagneticPinch : MonoBehaviour {
 	public readonly double XMODE_MIN = 4.5;
 	public readonly double XMODE_MAX = 5.5;
 
-
 	public readonly double YCOOR_MIN = -1.0;
 	public readonly double YCOOR_MAX = 0.5;
 	public readonly double ZCOOR_MIN = -3;
@@ -81,6 +96,7 @@ public class MagneticPinch : MonoBehaviour {
 	au_source.clip = clip_;
 	au_source.loop = false;
 	isHelpEnabled = false;
+	count = 0;
   }
 
   /** Finds an object to grab and grabs it. */
@@ -93,8 +109,12 @@ public class MagneticPinch : MonoBehaviour {
 		/*
 	 * Checks if the pinch_position's x-coordinate is within a given range, then checks for the z-coordinate.
 	 * This is necessary in creating the shapes for the soundscape environment.
-	 */
-	if (!isHelpEnabled) {
+	 * 
+	 * First, we check that help is currently disabled, or we are currently in the game itself.
+	 * Basic in-game functions using pinch all derive from the shape menu in the game, such as creating objects,
+	 * deleting them, and changing modes.
+	 */		
+		if (!isHelpEnabled) {
 		if (pinch_position[0] >= XCUBE_MIN && pinch_position[0] < XCUBE_MAX) { //for creating the cube
 			if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
 				if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
@@ -181,11 +201,9 @@ public class MagneticPinch : MonoBehaviour {
 						if (!isGestureMode) {
 							isGestureMode = true;
 							modeButton.GetComponent<Renderer>().material.mainTexture = (Texture) Resources.Load("Textures/Pause");
-						//	Debug.Log("TEXTURE IS PLAYED | " + modeButton.GetComponent<Renderer>().material.mainTexture);
 						} else if (isGestureMode) {
 							isGestureMode = false;
 							modeButton.GetComponent<Renderer>().material.mainTexture = (Texture) Resources.Load("Textures/Play");
-						//	Debug.Log("TEXTURE IS PAUSED | " + modeButton.GetComponent<Renderer>().material.mainTexture);
 						}
 				}
 			}
@@ -213,14 +231,98 @@ public class MagneticPinch : MonoBehaviour {
 				}
       	}
     }
+			/*
+			 * If help is enabled, then we proceed through a quick tutorial on the mechanics of the game./
+			 */
+  } else if (isHelpEnabled) {
 
-		} else { //user cannot interact with anything in scene when help screen is enabled except for the help button to close help screen
-			if (pinch_position[0] >= XHELP_MIN && pinch_position[0] < XHELP_MAX) { //for loading the Help GUI
-				if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
-					if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
-						isHelpEnabled = false;
-						_lt.changeIntensityHelpOnly(1.0f);
-						Debug.Log("HELP GUI DISABLED");
+			if (count == COUNT_CREATE) {
+
+				if (pinch_position[0] >= XCUBE_MIN && pinch_position[0] < XCUBE_MAX) { //for creating the cube
+					if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
+						if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
+							_cas.createObject(pinch_position[0], pinch_position[2], "CUBE");
+							isCreated = true;
+							playCreatedAudio();
+							count++;
+						}
+					}
+				} else if (pinch_position[0] >= XSPHERE_MIN && pinch_position[0] < XSPHERE_MAX) { //for creating the sphere
+					if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
+						if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
+							_cas.createObject(pinch_position[0], pinch_position[2], "SPHERE");
+							isCreated = true;
+							playCreatedAudio();
+							count++;
+						}
+					}
+				} else if (pinch_position[0] >= XCAPSULE_MIN && pinch_position[0] < XCAPSULE_MAX) { //for creating the capsule
+					if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
+						if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
+							_cas.createObject(pinch_position[0], pinch_position[2], "CAPSULE");
+							isCreated = true;
+							playCreatedAudio();
+							count++;
+						}
+					}
+				} else if (pinch_position[0] >= XCYLINDER_MIN && pinch_position[0] < XCYLINDER_MAX) { //for creating the cylinder
+					if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
+						if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
+							_cas.createObject(pinch_position[0], pinch_position[2], "CYLINDER");
+							isCreated = true;
+							playCreatedAudio();
+							count++;
+						}
+					}
+				}
+				
+				// Check if we pinched a movable object and grab the closest one that's not part of the hand.
+				Collider[] close_things = Physics.OverlapSphere(pinch_position, magnetDistance);
+				Vector3 distance = new Vector3(magnetDistance, 0.0f, 0.0f);
+				
+				for (int j = 0; j < close_things.Length; ++j) {
+					Vector3 new_distance = pinch_position - close_things[j].transform.position;
+					if (close_things[j].GetComponent<Rigidbody>() != null && new_distance.magnitude < distance.magnitude &&
+					    !close_things[j].transform.IsChildOf(transform)) {
+						grabbed_ = close_things[j];
+						distance = new_distance;
+					}
+				}
+			} else if (count == COUNT_DELETE) {
+				if (pinch_position[0] >= XGARBAGE_MIN && pinch_position[0] < XGARBAGE_MAX) { //for deleting all shapes in scene (Garbage)
+					if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
+						if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
+							isCreated = false;
+							_cas.destroyAudibleShapes();
+							playClearedAudio();
+							count++;
+						}
+					}
+				}
+			} else if (count == COUNT_MODE) {
+				if (pinch_position[0] >= XMODE_MIN && pinch_position[0] < XMODE_MAX) { //for changing b/w gesture mode and pinch mode
+					if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
+						if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
+							count++;
+							//							if (!isGestureMode) {
+							//								isGestureMode = true;
+							//								modeButton.GetComponent<Renderer>().material.mainTexture = (Texture) Resources.Load("Textures/Pause");
+							//								//	Debug.Log("TEXTURE IS PLAYED | " + modeButton.GetComponent<Renderer>().material.mainTexture);
+							//							} else if (isGestureMode) {
+							//								isGestureMode = false;
+							//								modeButton.GetComponent<Renderer>().material.mainTexture = (Texture) Resources.Load("Textures/Play");
+							//								//	Debug.Log("TEXTURE IS PAUSED | " + modeButton.GetComponent<Renderer>().material.mainTexture);
+						}
+					}
+				}
+			} else if (count == COUNT_HELP) {
+				if (pinch_position[0] >= XHELP_MIN && pinch_position[0] < XHELP_MAX) { //for loading the Help GUI
+					if (pinch_position[1] >= YCOOR_MIN && pinch_position[1] < YCOOR_MAX) {
+						if (pinch_position[2] >= ZCOOR_MIN && pinch_position[2] < ZCOOR_MAX) {
+							count = 0;
+							isHelpEnabled = false;
+							Debug.Log("TUTORIAL IS COMPLETE");
+						}
 					}
 				}
 			}
@@ -248,18 +350,48 @@ public class MagneticPinch : MonoBehaviour {
     grabbed_ = null;
     pinching_ = false;
 	au_source.Stop();
+
+		if (count == COUNT_PLACE)
+			count++;
   }
 
   /**
    * Checks whether the hand is pinching and updates the position of the pinched object.
    */
   void Update() {
+
+	if (isHelpEnabled) {
+		if (count == COUNT_CREATE) {
+			spt_cube.changeSpotlightIntensity(7);
+			spt_sphere.changeSpotlightIntensity(7);
+			spt_capsule.changeSpotlightIntensity(7);
+			spt_cylinder.changeSpotlightIntensity(7);
+		} else if (count == COUNT_PLACE) {
+			spt_cube.changeSpotlightIntensity(0);
+			spt_sphere.changeSpotlightIntensity(0);
+			spt_capsule.changeSpotlightIntensity(0);
+			spt_cylinder.changeSpotlightIntensity(0);
+			spt_grid.changeSpotlightIntensity(4);
+		} else if (count == COUNT_DELETE) {
+			spt_grid.changeSpotlightIntensity(0);
+			spt_garbage.changeSpotlightIntensity(7);
+		} else if (count == COUNT_MODE) {
+			spt_garbage.changeSpotlightIntensity(0);
+			spt_mode.changeSpotlightIntensity(7);
+		} else if (count == COUNT_HELP) {
+			spt_mode.changeSpotlightIntensity(0);
+			spt_tutorial.changeSpotlightIntensity(7);
+		}
+	} else {
+			spt_tutorial.changeSpotlightIntensity(0);	
+	}
+
     bool trigger_pinch = false;
     HandModel hand_model = GetComponent<HandModel>();
     Hand leap_hand = hand_model.GetLeapHand();
 
     if (leap_hand == null)
-      return;
+			return;
 
     // Scale trigger distance by thumb proximal bone length.
     Vector leap_thumb_tip = leap_hand.Fingers[0].TipPosition;
@@ -303,56 +435,87 @@ public class MagneticPinch : MonoBehaviour {
 		
 		GUI.skin.box = header;
 		header.fontStyle = FontStyle.Italic;
-		GUI.Box(new Rect(-125,0,1000,100), prefab.GetComponent<GUIText>().text);
+		GUI.Box(new Rect(112,0,900,100), prefab.GetComponent<GUIText>().text);
 		
 		//	Debug.Log("SCREEN WIDTH: " + Screen.width + " | SCREEN HEIGHT: " + Screen.height);
-		GUI.BeginGroup(new Rect(345, 146.5f, 800, 450));
+		GUI.BeginGroup(new Rect(295, 146.5f, 900, 150));
 		
 		//testing purposes only
 		GUI.skin.box = main;
-		GUI.Box(new Rect(0, 0, 800, 450), "");
+		GUI.Box(new Rect(0, 0, 1000, 150), "");
 		
 		GUI.skin.box = style;
 		
 		if (timeLeft < 0  && !isPinched) {
 			isPinched = true;
-			hand = (Texture) Resources.Load("Images/PinchedHand");
+				if (count == COUNT_PLACE)
+					hand = (Texture) Resources.Load("Images/Unpinching_1");
+				else
+					hand = (Texture) Resources.Load("Images/Pinching_2");
+			timeLeft = 2.0f;
 			timeLeft = 2.0f;
 			timeLeft -= Time.deltaTime;
 		} else if (timeLeft < 0 && isPinched){
 			isPinched = false;
-			hand = (Texture) Resources.Load("Images/UnpinchedHand");
+				if (count == COUNT_PLACE)
+					hand = (Texture) Resources.Load ("Images/Unpinching_2");
+				else
+					hand = (Texture) Resources.Load("Images/Pinching_1");
 			timeLeft = 2.0f;
 			timeLeft -= Time.deltaTime;
 		}
-		
-		GUILayout.BeginHorizontal("BOX");
-		GUI.DrawTexture(new Rect(20, 10, 150, 150), hand, ScaleMode.ScaleToFit, true, 0);
-		GUI.Box(new Rect(180, 10, 440, 150), "Use the Pinch Gesture to interact with stuff, like:");
-		GUILayout.EndHorizontal();
-		
-		GUI.skin.box = substyle;
-		
-		GUILayout.BeginHorizontal("BOX");
-		GUI.DrawTexture(new Rect(45, 175, 100, 100), cube, ScaleMode.ScaleToFit, true, 0);
-		GUI.DrawTexture(new Rect(155, 175, 100, 100), sphere, ScaleMode.ScaleToFit, true, 0);
-		GUI.DrawTexture(new Rect(245, 175, 100, 100), capsule, ScaleMode.ScaleToFit, true, 0);
-		GUI.DrawTexture(new Rect(320, 175, 100, 100), cylinder, ScaleMode.ScaleToFit, true, 0);
-		GUI.Box(new Rect(370, 175, 200, 100), "Create and pick up objects");
-		GUILayout.EndHorizontal();
-		
-		GUILayout.BeginHorizontal("BOX");
-		GUI.DrawTexture(new Rect(100, 280, 100, 100), help, ScaleMode.ScaleToFit, true, 0);
-		GUI.Box(new Rect(150, 280, 150, 100), "Open/Close Help");
-		GUI.DrawTexture(new Rect(390, 280, 100, 100), garbage, ScaleMode.ScaleToFit, true, 0);
-		GUI.Box(new Rect(445, 280, 150, 100), "Clear Scene");
-		GUILayout.EndHorizontal();
-		
-		GUILayout.BeginHorizontal("BOX");
-		GUI.DrawTexture(new Rect(175, 360, 100, 100), mode, ScaleMode.ScaleToFit, true, 0);
-		GUI.Box(new Rect(225, 360, 150, 100), "Change to Gesture Mode");
-		GUILayout.EndHorizontal();
-		GUI.EndGroup();
+
+			if (MagneticPinch.count == MagneticPinch.COUNT_CREATE) {
+				GUILayout.BeginHorizontal();
+				GUI.DrawTexture(new Rect(35,5,140,140), hand, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box(new Rect(190,0,25,150), "ON");
+				GUI.DrawTexture(new Rect(225, 25, 100, 100), cube, ScaleMode.ScaleToFit, true, 0);
+				GUI.DrawTexture(new Rect(335, 25, 100, 100), sphere, ScaleMode.ScaleToFit, true, 0);
+				GUI.DrawTexture(new Rect(425, 25, 100, 100), capsule, ScaleMode.ScaleToFit, true, 0);
+				GUI.DrawTexture(new Rect(500, 25, 100, 100), cylinder, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box(new Rect(600,0,300,150), "TO CREATE AND GRAB");
+				GUILayout.EndHorizontal();
+			} else if (MagneticPinch.count == MagneticPinch.COUNT_PLACE) {
+				GUILayout.BeginHorizontal();
+				GUI.Box(new Rect(55, 0, 45, 150), "Next, ");
+				GUI.DrawTexture(new Rect(125,5,140,140), hand, ScaleMode.ScaleToFit, true, 0);
+				GUI.DrawTexture(new Rect(285, 25, 100, 100), cube, ScaleMode.ScaleToFit, true, 0);
+				GUI.DrawTexture(new Rect(395, 25, 100, 100), sphere, ScaleMode.ScaleToFit, true, 0);
+				GUI.DrawTexture(new Rect(485, 25, 100, 100), capsule, ScaleMode.ScaleToFit, true, 0);
+				GUI.DrawTexture(new Rect(560, 25, 100, 100), cylinder, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box(new Rect(660,0,25,150), "to Release it");
+				GUILayout.EndHorizontal();
+			} else if (MagneticPinch.count == MagneticPinch.COUNT_DELETE) {
+				GUILayout.BeginHorizontal();
+				GUI.Box(new Rect(200, 0, 45, 150), "Next, ");
+				GUI.DrawTexture(new Rect(270,5,140,140), hand, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box(new Rect(430,0,25,150), "ON");
+				GUI.DrawTexture(new Rect(465, 25, 100, 100), garbage, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box (new Rect(580, 0, 150, 150), "TO CLEAR SCENE");
+				GUILayout.EndHorizontal();
+			} else if (MagneticPinch.count == MagneticPinch.COUNT_MODE) {
+				GUILayout.BeginHorizontal();
+				GUI.Box(new Rect(175, 0, 45, 150), "Next, ");
+				GUI.DrawTexture(new Rect(245,5,140,140), hand, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box(new Rect(405,0,25,150), "ON");
+				GUI.DrawTexture(new Rect(460, 37, 75, 75), mode, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box (new Rect(555, 0, 150, 150), "TO CHANGE MODES");
+				GUILayout.EndHorizontal();
+			} else if (MagneticPinch.count == MagneticPinch.COUNT_HELP) {
+				GUILayout.BeginHorizontal();
+				GUI.Box(new Rect(75, 0, 45, 150), "Finally, ");
+				GUI.DrawTexture(new Rect(175,5,140,140), hand, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box(new Rect(335,0,25,150), "ON");
+				GUI.DrawTexture(new Rect(380, 37, 75, 75), help, ScaleMode.ScaleToFit, true, 0);
+				GUI.Box (new Rect(475, 0, 150, 150), "TO OPEN AND CLOSE TUTORIAL");
+				GUILayout.EndHorizontal();
+			}
+			GUI.EndGroup();
+
+			if (count == COUNT_HELP) {
+				GUI.skin.box = enjoy;
+				GUI.Box(new Rect(625, 310, 800, 150), "ENJOY!");
+			}
 		}
 	}
 }
